@@ -4,31 +4,67 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.wql.dao.MessageMapper">
+<!--    private int messageId;//启事序号-->
+<!--    private String messageType;//启事类型-->
+<!--    private String objectName;//物品名称-->
+<!--    private String objectType;//物品类型-->
+<!--    private Date messageDate;//发布日期-->
+<!--    private String messageState;//启事状态-->
+<!--    private String description;//具体描述-->
+<!--    private String userId;//发布人-->
 
-    <insert id="addMessage" parameterType="Messages">
-        insert into message (type,state,name,time,detail,kind,place)
-        values (#{type},#{state},#{name},#{time},#{detail},#{kind},#{place});
+    <insert id="addMessage" parameterType="Message">
+        INSERT INTO message VALUES(#{messageId},#{messageType},#{objectName},#{objectType},
+                                   #{messageDate},#{messageState},#{description},#{userId});
     </insert>
 
-    <delete id="deleteMessageById" parameterType="int">
-        delete from message where id=#{id};
+    <delete id="deleteMessage">
+        DELETE FROM message WHERE messageId=#{messageId}
     </delete>
 
-    <update id="updateMessage" parameterType="Messages">
-        update message
-        set type=#{type},state=#{state},name=#{name},time=#{time},detail=#{detail},kind=#{kind},#{place}
-        where id=#{id};
+    <update id="modifyMessage" parameterType="Message">
+        UPDATE FROM message SET
+            messageType=#{messageType},
+            objectName=#{objectName},
+            objectType=#{objectType},
+            messageDate=#{messageDate},
+            messageState=#{messageState},
+            description=#{description},
+            userId=#{userId}
+        WHERE messageId=#{messageId}
     </update>
 
-    <select id="queryMessageById" resultType="Messages">
-        select * from message
-        where id=#{id};
+    <update id="acceptMessageById">
+        UPDATE message SET messageState="审核通过" WHERE messageId=#{messageId}
+    </update>
+
+    <update id="rejectMessageById">
+        UPDATE message SET messageState="审核未通过" WHERE messageId=#{messageId}
+    </update>
+
+    <select id="getAllMessage" resultType="Message">
+--         SELECT messageId,messageType,objectName,objectType,messageDate,messageState,description,userId  FROM message;
+        SELECT * FROM message
     </select>
 
-    <select id="queryAllMessage" resultType="Messages">
-        select * from message;
+    <select id="getAllPassedMessage" resultType="Message">
+        SELECT * FROM message WHERE messageState="审核通过"
     </select>
 
+    <select id="getAllNeedCheckMessage" resultType="Message">
+        SELECT * FROM message WHERE messageState="待审核"
+    </select>
 
+    <select id="getAllNeedModifyMessage" resultType="Message">
+        SELECT * FROM message WHERE messageState="审核未通过"
+    </select>
+
+    <select id="getMessageById" resultType="Message">
+        SELECT * FROM message WHERE messageId=#{messageId}
+    </select>
+
+    <select id="getMessageByUserId" resultType="Message">
+        SELECT * FROM message WHERE userId=#{userId}
+    </select>
 
 </mapper>

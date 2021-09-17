@@ -11,6 +11,7 @@ public class Messages {
     private String detail;
     private String kind;
     private String place;
+    private String pic_url;
 
 
     public int getId() {
@@ -75,5 +76,13 @@ public class Messages {
 
     public void setPlace(String place) {
         this.place = place;
+    }
+
+    public String getPic_url() {
+        return pic_url;
+    }
+
+    public void setPic_url(String pic_url) {
+        this.pic_url = pic_url;
     }
 }

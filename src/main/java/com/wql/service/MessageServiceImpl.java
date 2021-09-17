@@ -1,37 +1,82 @@
 package com.wql.service;
 
 import com.wql.dao.MessageMapper;
-import com.wql.pojo.Messages;
+import com.wql.pojo.Message;
+import com.wql.util.SystemConstant;
 
+import java.util.Date;
 import java.util.List;
-
 
 public class MessageServiceImpl implements MessageService {
 
     private MessageMapper messageMapper;
-
-    public void setMessageMapper(MessageMapper messageMapper){
+    public void setMessageMapper(MessageMapper messageMapper) {
         this.messageMapper = messageMapper;
     }
 
-    public int addMessage(Messages message){
-        return messageMapper.addMessage(message);
+    @Override
+    public String addMessage(Message message) {
+        this.messageMapper.addMessage(message);
+        return SystemConstant.SUCCESS;
     }
 
-    public int deleteMessageById(int id){
-        return messageMapper.deleteMessageById(id);
+    @Override
+    public String modifyMessage(Message message) {
+        if(this.messageMapper.getMessageById(message.getMessageId())==null){
+            return "错误，该启事不存在";
+        }
+        else {
+            this.messageMapper.modifyMessage(message);
+            return SystemConstant.SUCCESS;
+        }
     }
 
-    public int updateMessage(Messages book){
-        return messageMapper.updateMessage(book);
+    @Override
+    public String deleteMessage(int messageId) {
+        if(this.messageMapper.getMessageById(messageId)==null){
+            return "错误，该启事不存在";
+        }
+        else {
+            this.messageMapper.deleteMessage(messageId);
+            return SystemConstant.SUCCESS;
+        }
     }
 
-    public Messages queryMessageById(int id){
-        return messageMapper.queryMessageById(id);
+    @Override
+    public List<Message> getAllMessage() {
+        return messageMapper.getAllMessage();
     }
 
-    public List<Messages> queryAllMessage(){
-        return messageMapper.queryAllMessage();
+    @Override
+    public List<Message> getMessageByUserId(String userId) {
+        return messageMapper.getMessageByUserId(userId);
+    }
+
+    @Override
+    public String acceptMessageByUserId(int messageId) {
+        if(this.messageMapper.getMessageById(messageId)==null){
+            return "错误，该启事不存在";
+        }
+        else {
+            this.messageMapper.acceptMessageById(messageId);
+            return SystemConstant.SUCCESS;
+        }
+    }
+
+    @Override
+    public String rejectMessageByUserId(int messageId) {
+        if(this.messageMapper.getMessageById(messageId)==null){
+            return "错误，该启事不存在";
+        }
+        else {
+            this.messageMapper.rejectMessageById(messageId);
+            return SystemConstant.SUCCESS;
+        }
+    }
+
+    @Override
+    public List<Message> getAllPassedMessage() {
+        return messageMapper.getAllPassedMessage();
     }
 
 }

@@ -1,18 +1,25 @@
 package com.wql.service;
 
-import com.wql.pojo.Messages;
+import com.wql.pojo.Message;
 
+import java.util.Date;
 import java.util.List;
 
-
 public interface MessageService {
-    int addMessage(Messages message);
 
-    int deleteMessageById(int id);
+    String addMessage(Message message);
 
-    int updateMessage(Messages message);
+    String modifyMessage(Message message);
 
-    Messages queryMessageById(int id);
+    String deleteMessage(int messageId);
 
-    List<Messages> queryAllMessage();
+    List<Message> getAllMessage();
+
+    List<Message> getMessageByUserId(String userId);
+
+    String acceptMessageByUserId(int messageId);
+
+    String rejectMessageByUserId(int messageId);
+
+    List<Message> getAllPassedMessage();
 }
