@@ -14,12 +14,13 @@ public class Message {
     private String messageState;//启事状态
     private String description;//具体描述
     private String userId;//发布人
+    private String picUrl;
 
     public Message() {
 
     }
 
-    public Message(int messageId, String messageType, String objectName, String objectType, String messageDate, String messageState, String description, String userId) {
+    public Message(int messageId, String messageType, String objectName, String objectType, String messageDate, String messageState, String description, String userId,String picUrl) {
         this.messageId = messageId;
         this.messageType = messageType;
         this.objectName = objectName;
@@ -28,6 +29,7 @@ public class Message {
         this.messageState = messageState;
         this.description = description;
         this.userId = userId;
+        this.picUrl=picUrl;
     }
 
     public int getMessageId() {
@@ -94,4 +96,11 @@ public class Message {
         this.userId = userId;
     }
 
+    public String getPicUrl() {
+        return picUrl;
+    }
+
+    public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
+    }
 }

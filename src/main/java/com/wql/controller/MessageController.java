@@ -12,7 +12,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,7 +25,7 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping(value="/message")
+@RequestMapping(value = "/message")
 public class MessageController {
 
     @Autowired
@@ -40,27 +44,28 @@ public class MessageController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/addMessage",produces = "application/json;charset=utf-8")
-    @ResponseBody
-    public String addMessage(@RequestParam("messageId") int messageId,
-                             @RequestParam("messageType") String messageType,
-                             @RequestParam("objectName") String objectName,
-                             @RequestParam("objectType") String objectType,
-                             @RequestParam("messageDate") String messageDate,
-                             @RequestParam("messageState") String messageState,
-                             @RequestParam("description") String description,
-                             @RequestParam("userId") String userId) {
-        Map<String,Object> map=new HashMap<>();
-
-        Message message=new Message(messageId,messageType,objectType,objectName,messageDate,SystemConstant.NEED_CHECK,description,userId);
-        String res=messageService.addMessage(message);
-        map.put(SystemConstant.MESSAGE,res);
-
-        return JSON.toJSONString(map);
-    }
+//    @RequestMapping(value = "/addMessage",produces = "application/json;charset=utf-8")
+//    @ResponseBody
+//    public String addMessage(@RequestParam("messageId") int messageId,
+//                             @RequestParam("messageType") String messageType,
+//                             @RequestParam("objectName") String objectName,
+//                             @RequestParam("objectType") String objectType,
+//                             @RequestParam("messageDate") String messageDate,
+//                             @RequestParam("messageState") String messageState,
+//                             @RequestParam("description") String description,
+//                             @RequestParam("userId") String userId) {
+//        Map<String,Object> map=new HashMap<>();
+//
+//        Message message=new Message(messageId,messageType,objectType,objectName,messageDate,SystemConstant.NEED_CHECK,description,userId);
+//        String res=messageService.addMessage(message);
+//        map.put(SystemConstant.MESSAGE,res);
+//
+//        return JSON.toJSONString(map);
+//    }
 
     /**
      * 修改启事
+     *
      * @param messageId
      * @param messageType
      * @param objectName
@@ -71,49 +76,50 @@ public class MessageController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/modifyMessage",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/modifyMessage", produces = "application/json;charset=utf-8")
     public String modifyMessage(@RequestParam("messageId") int messageId,
-                             @RequestParam("messageType") String messageType,
-                             @RequestParam("objectName") String objectName,
-                             @RequestParam("objectType") String objectType,
-                             @RequestParam("messageDate") String messageDate,
-                             @RequestParam("messageState") String messageState,
-                             @RequestParam("description") String description,
-                             @RequestParam("userId") String userId) {
-        Map<String,Object> map=new HashMap<>();
-
-
-        Message message=new Message(messageId,messageType,objectType,objectName,messageDate,SystemConstant.NEED_CHECK,description,userId);
-        String res=messageService.modifyMessage(message);
-        map.put(SystemConstant.MESSAGE,res);
+                                @RequestParam("messageType") String messageType,
+                                @RequestParam("objectName") String objectName,
+                                @RequestParam("objectType") String objectType,
+                                @RequestParam("messageDate") String messageDate,
+                                @RequestParam("messageState") String messageState,
+                                @RequestParam("description") String description,
+                                @RequestParam("userId") String userId) {
+        Map<String, Object> map = new HashMap<>();
+        String picUrl = String.valueOf(messageId) + ".jpg";
+        Message message = new Message(messageId, messageType, objectType, objectName, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
+        String res = messageService.modifyMessage(message);
+        map.put(SystemConstant.MESSAGE, res);
 
         return JSON.toJSONString(map);
     }
 
     /**
      * 删除启事
+     *
      * @param messageId
      * @return
      */
-    @RequestMapping(value = "/deleteMessage",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/deleteMessage", produces = "application/json;charset=utf-8")
     @ResponseBody
     public String deleteMessage(@RequestParam("messageId") int messageId) {
-        Map<String,Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
 
-        String res=messageService.deleteMessage(messageId);
-        map.put(SystemConstant.MESSAGE,res);
+        String res = messageService.deleteMessage(messageId);
+        map.put(SystemConstant.MESSAGE, res);
 
         return JSON.toJSONString(map);
     }
 
     /**
      * 获取所有启事信息
+     *
      * @return
      */
-    @RequestMapping(value = "/getAllMessage",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/getAllMessage", produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String getAllMessage(){
-        List<Message> list=messageService.getAllMessage();
+    public String getAllMessage() {
+        List<Message> list = messageService.getAllMessage();
         System.out.println(list);
         System.out.println(JSONArray.toJSONString(list));
         return JSONArray.toJSONString(list);
@@ -121,57 +127,125 @@ public class MessageController {
 
     /**
      * 按用户id查找启事信息
+     *
      * @param
      * @return
      */
-    @RequestMapping(value = "/getMessageByUserId",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/getMessageByUserId", produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String getMessageByUserId(@RequestParam("id") String id){
-        List<Message> list=messageService.getMessageByUserId(id);
+    public String getMessageByUserId(@RequestParam("id") String id) {
+        List<Message> list = messageService.getMessageByUserId(id);
         return JSONArray.toJSONString(list);
     }
 
     /**
      * 根据id审核通过启事
+     *
      * @param messageId
      * @return
      */
-    @RequestMapping(value = "/acceptMessageByUserId",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/acceptMessageByUserId", produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String acceptMessageByUserId(@RequestParam("messageId") int messageId){
-        Map<String,Object> map=new HashMap<>();
+    public String acceptMessageByUserId(@RequestParam("messageId") int messageId) {
+        Map<String, Object> map = new HashMap<>();
 
-        String res=messageService.acceptMessageByUserId(messageId);
-        map.put(SystemConstant.MESSAGE,res);
+        String res = messageService.acceptMessageByUserId(messageId);
+        map.put(SystemConstant.MESSAGE, res);
 
         return JSONArray.toJSONString(map);
     }
 
     /**
      * 根据id审核拒绝启事
+     *
      * @param messageId
      * @return
      */
-    @RequestMapping(value = "rejectMessageByUserId",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "rejectMessageByUserId", produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String rejectMessageByUserId(@RequestParam("messageId") int messageId){
-        Map<String,Object> map=new HashMap<>();
+    public String rejectMessageByUserId(@RequestParam("messageId") int messageId) {
+        Map<String, Object> map = new HashMap<>();
 
-        String res=messageService.rejectMessageByUserId(messageId);
-        map.put(SystemConstant.MESSAGE,res);
+        String res = messageService.rejectMessageByUserId(messageId);
+        map.put(SystemConstant.MESSAGE, res);
 
         return JSONArray.toJSONString(map);
     }
 
     /**
      * 获取所有通过审核的启事信息
+     *
      * @return
      */
-    @RequestMapping(value = "/getAllPassedMessage",produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/getAllPassedMessage", produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String getPassedAllMessage(){
-        List<Message> list=messageService.getAllPassedMessage();
+    public String getPassedAllMessage() {
+        List<Message> list = messageService.getAllPassedMessage();
         return JSONArray.toJSONString(list);
     }
 
+
+    @RequestMapping(value = "/uploadPicture", produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public String uploadPicture(@RequestParam("messageId") int messageId,
+                                @RequestParam("messageType") String messageType,
+                                @RequestParam("objectName") String objectName,
+                                @RequestParam("objectType") String objectType,
+                                @RequestParam("messageDate") String messageDate,
+                                @RequestParam("messageState") String messageState,
+                                @RequestParam("description") String description,
+                                @RequestParam("userId") String userId,
+                                @RequestParam(value = "file", required = false) MultipartFile file) {
+        Map<String, Object> map = new HashMap<>();
+        String picUrl;
+        if (file == null) picUrl = "";
+        else picUrl = messageId + ".jpg";
+        Message message = new Message(messageId, messageType, objectType, objectName, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
+        String res = messageService.addMessage(message);
+        map.put(SystemConstant.MESSAGE, res);
+
+        File fileDir = new File("D:/java/img");
+        if (!fileDir.exists()) {
+            //如果没有目录应该创建目录
+            fileDir.mkdirs();
+        }
+        //获取图片名称
+        String imgName = file.getOriginalFilename();
+        String path = "D:/java/img/" + imgName;
+        //文件实现上传
+        try {
+            file.transferTo(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString(map);
+    }
+
+    @RequestMapping(value = "/getPicture", produces = "application/json;charset=utf-8")
+    @ResponseBody
+    public void getPicture(String filename, HttpServletResponse response) {
+        FileInputStream in = null;
+        ServletOutputStream out = null;
+        try {
+            File file = new File("D:/java/img/" + filename);
+            in = new FileInputStream(file);
+            out = response.getOutputStream();
+            byte[] bytes = new byte[1024 * 10];
+            int len = 0;
+            while ((len = in.read(bytes)) != -1) {
+                out.write(bytes, 0, len);
+            }
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
+

@@ -15,7 +15,7 @@
 
     <insert id="addMessage" parameterType="Message">
         INSERT INTO message VALUES(#{messageId},#{messageType},#{objectName},#{objectType},
-                                   #{messageDate},#{messageState},#{description},#{userId});
+                                   #{messageDate},#{messageState},#{description},#{userId},#{picUrl});
     </insert>
 
     <delete id="deleteMessage">
@@ -23,7 +23,7 @@
     </delete>
 
     <update id="modifyMessage" parameterType="Message">
-        UPDATE FROM message SET
+        UPDATE message SET
             messageType=#{messageType},
             objectName=#{objectName},
             objectType=#{objectType},
