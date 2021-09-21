@@ -30,6 +30,7 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-web:5.1.9.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:5.1.9.RELEASE" />
           <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.47" />
+          <element id="library" level="project" name="Maven: net.coobird:thumbnailator:0.4.8" />
         </element>
       </element>
     </root>

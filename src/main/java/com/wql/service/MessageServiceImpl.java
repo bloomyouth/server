@@ -79,4 +79,12 @@ public class MessageServiceImpl implements MessageService {
         return messageMapper.getAllPassedMessage();
     }
 
+    @Override
+    public Message getMaxMessageId() {
+        if(this.messageMapper.getMaxMessageId()==null);
+        return this.messageMapper.getMaxMessageId();
+    }
+
+    @Override
+    public Message getMessageByMessageId(int messageId){return messageMapper.getMessageById(messageId);}
 }

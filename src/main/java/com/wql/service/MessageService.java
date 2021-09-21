@@ -22,4 +22,8 @@ public interface MessageService {
     String rejectMessageByUserId(int messageId);
 
     List<Message> getAllPassedMessage();
+
+    Message getMaxMessageId();
+
+    Message getMessageByMessageId(int messageId);
 }

@@ -6,6 +6,7 @@ import com.wql.pojo.Message;
 import com.wql.pojo.User;
 import com.wql.service.MessageService;
 import com.wql.util.SystemConstant;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -77,6 +78,7 @@ public class MessageController {
      * @return
      */
     @RequestMapping(value = "/modifyMessage", produces = "application/json;charset=utf-8")
+    @ResponseBody
     public String modifyMessage(@RequestParam("messageId") int messageId,
                                 @RequestParam("messageType") String messageType,
                                 @RequestParam("objectName") String objectName,
@@ -84,10 +86,10 @@ public class MessageController {
                                 @RequestParam("messageDate") String messageDate,
                                 @RequestParam("messageState") String messageState,
                                 @RequestParam("description") String description,
-                                @RequestParam("userId") String userId) {
+                                @RequestParam("userId") String userId,
+                                @RequestParam("picUrl") String picUrl){
         Map<String, Object> map = new HashMap<>();
-        String picUrl = String.valueOf(messageId) + ".jpg";
-        Message message = new Message(messageId, messageType, objectType, objectName, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
+        Message message = new Message(messageId, messageType, objectName, objectType, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
         String res = messageService.modifyMessage(message);
         map.put(SystemConstant.MESSAGE, res);
 
@@ -104,6 +106,17 @@ public class MessageController {
     @ResponseBody
     public String deleteMessage(@RequestParam("messageId") int messageId) {
         Map<String, Object> map = new HashMap<>();
+        Message message=messageService.getMessageByMessageId(messageId);
+        try{   //删除本土的图片
+            File file = new File("D:/java/img/"+message.getPicUrl());
+            if(file.delete()){
+                System.out.println(file.getName() + " 文件已被删除！");
+            }else{
+                System.out.println("文件删除失败！");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
         String res = messageService.deleteMessage(messageId);
         map.put(SystemConstant.MESSAGE, res);
@@ -185,7 +198,7 @@ public class MessageController {
     }
 
 
-    @RequestMapping(value = "/uploadPicture", produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/addMessage", produces = "application/json;charset=utf-8")
     @ResponseBody
     public String uploadPicture(@RequestParam("messageId") int messageId,
                                 @RequestParam("messageType") String messageType,
@@ -198,9 +211,13 @@ public class MessageController {
                                 @RequestParam(value = "file", required = false) MultipartFile file) {
         Map<String, Object> map = new HashMap<>();
         String picUrl;
+        int id;
+        Message mes=messageService.getMaxMessageId();
+        if(mes==null) id=1;
+        else id=mes.getMessageId()+1;
         if (file == null) picUrl = "";
-        else picUrl = messageId + ".jpg";
-        Message message = new Message(messageId, messageType, objectType, objectName, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
+        else picUrl = file.getOriginalFilename();
+        Message message = new Message(id, messageType,objectName , objectType, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
         String res = messageService.addMessage(message);
         map.put(SystemConstant.MESSAGE, res);
 
@@ -209,9 +226,7 @@ public class MessageController {
             //如果没有目录应该创建目录
             fileDir.mkdirs();
         }
-        //获取图片名称
-        String imgName = file.getOriginalFilename();
-        String path = "D:/java/img/" + imgName;
+        String path = "D:/java/img/" + picUrl;
         //文件实现上传
         try {
             file.transferTo(new File(path));
@@ -224,27 +239,34 @@ public class MessageController {
     @RequestMapping(value = "/getPicture", produces = "application/json;charset=utf-8")
     @ResponseBody
     public void getPicture(String filename, HttpServletResponse response) {
-        FileInputStream in = null;
-        ServletOutputStream out = null;
+//        FileInputStream in = null;
+//        ServletOutputStream out = null;
+//        try {
+//            File file = new File("D:/java/img/" + filename);
+//            in = new FileInputStream(file);
+//            out = response.getOutputStream();
+//            byte[] bytes = new byte[1024 * 10];
+//            int len = 0;
+//            while ((len = in.read(bytes)) != -1) {
+//                out.write(bytes, 0, len);
+//            }
+//            out.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                in.close();
+//                out.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        String path="D:/java/img/" + filename;
         try {
-            File file = new File("D:/java/img/" + filename);
-            in = new FileInputStream(file);
-            out = response.getOutputStream();
-            byte[] bytes = new byte[1024 * 10];
-            int len = 0;
-            while ((len = in.read(bytes)) != -1) {
-                out.write(bytes, 0, len);
-            }
-            out.flush();
+//            Thumbnails.of(new File(path)).scale(0.15).outputQuality(0.8).toOutputStream(response.getOutputStream());
+            Thumbnails.of(new File(path)).width(300).height(350).outputQuality(0.8).toOutputStream(response.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                in.close();
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

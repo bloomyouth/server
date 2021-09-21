@@ -30,7 +30,8 @@
             messageDate=#{messageDate},
             messageState=#{messageState},
             description=#{description},
-            userId=#{userId}
+            userId=#{userId},
+            picUrl=#{picUrl}
         WHERE messageId=#{messageId}
     </update>
 
@@ -65,6 +66,10 @@
 
     <select id="getMessageByUserId" resultType="Message">
         SELECT * FROM message WHERE userId=#{userId}
+    </select>
+
+    <select id="getMaxMessageId" resultType="Message">
+        SELECT * FROM message WHERE messageId=(SELECT MAX(messageId) FROM message)
     </select>
 
 </mapper>

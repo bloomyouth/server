@@ -48,4 +48,5 @@ public interface MessageMapper {
     //获取满足限制的启事信息
     List<Message> getMessageUnderConstrain(Date date, List<String> noticeType, List<String> objectType, String keyword);
 
+    Message getMaxMessageId();
 }
