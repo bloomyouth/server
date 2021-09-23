@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="com.huawei.gauss.jdbc.ZenithDriver-GaussDB_100_1.0.0.B019">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../com.huawei.gauss.jdbc.ZenithDriver-GaussDB_100_1.0.0.B019.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -215,24 +215,28 @@ public class MessageController {
         Message mes=messageService.getMaxMessageId();
         if(mes==null) id=1;
         else id=mes.getMessageId()+1;
+        System.out.println(file);
         if (file == null) picUrl = "";
-        else picUrl = file.getOriginalFilename();
+        else {
+            picUrl = file.getOriginalFilename();
+            File fileDir = new File("D:/java/img");
+            if (!fileDir.exists()) {
+                //如果没有目录应该创建目录
+                fileDir.mkdirs();
+            }
+            String path = "D:/java/img/" + picUrl;
+            //文件实现上传
+            try {
+                file.transferTo(new File(path));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         Message message = new Message(id, messageType,objectName , objectType, messageDate, SystemConstant.NEED_CHECK, description, userId, picUrl);
         String res = messageService.addMessage(message);
         map.put(SystemConstant.MESSAGE, res);
 
-        File fileDir = new File("D:/java/img");
-        if (!fileDir.exists()) {
-            //如果没有目录应该创建目录
-            fileDir.mkdirs();
-        }
-        String path = "D:/java/img/" + picUrl;
-        //文件实现上传
-        try {
-            file.transferTo(new File(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         return JSON.toJSONString(map);
     }
 
